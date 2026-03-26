@@ -103,10 +103,10 @@ function App() {
   const [bcPrice, setBcPrice] = useState(3600000);
   const [abCC, setAbCC] = useState(20000);
   const [bcCC, setBcCC] = useState(20000);
+  const [dcFeeRate, setDcFeeRate] = useState(0.0225);
 
   const c = useMemo(() => {
     const abPurchase = 3500000;
-    const dcFeeRate = 0.02;
     const echoFeeRate = 0.025;
     const dscrRate = 0.80;
     const sellerCarry = 700000;
@@ -179,7 +179,7 @@ function App() {
       hilameNetOOP,
       totalC2In: dscrLoan + echo + hilameOOP,
     };
-  }, [bcPrice, abCC, bcCC]);
+  }, [bcPrice, abCC, bcCC, dcFeeRate]);
 
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", padding: "32px 20px" }}>
@@ -215,7 +215,7 @@ function App() {
         </div>
       </Card>
 
-      {/* Closing Cost Sliders */}
+      {/* Closing Cost & Rate Sliders */}
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "24px" }}>
         <Card>
           <div style={{ padding: "16px 20px", minWidth: "280px", flex: "1 1 280px" }}>
@@ -240,6 +240,19 @@ function App() {
               onChange={(e) => setBcCC(Number(e.target.value))} />
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#94a3b8", marginTop: "4px" }}>
               <span>$5,000</span><span>$75,000</span>
+            </div>
+          </div>
+        </Card>
+        <Card>
+          <div style={{ padding: "16px 20px", minWidth: "280px", flex: "1 1 280px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+              <label style={{ fontWeight: 700, color: "#1e293b", fontSize: "13px" }}>DC Funding Rate (A->B)</label>
+              <span style={{ fontSize: "20px", fontWeight: 800, color: "#dc2626" }}>{(dcFeeRate * 100).toFixed(2)}%</span>
+            </div>
+            <input type="range" min={0.015} max={0.04} step={0.0025} value={dcFeeRate}
+              onChange={(e) => setDcFeeRate(Number(e.target.value))} />
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#94a3b8", marginTop: "4px" }}>
+              <span>1.50%</span><span>4.00%</span>
             </div>
           </div>
         </Card>
@@ -337,7 +350,7 @@ function App() {
 
           <h4 style={{ color: "#dc2626", fontSize: "13px", margin: "16px 0 4px", textTransform: "uppercase" }}>Cash Out</h4>
           <Table headers={["To", "Amount", "Purpose"]} rows={[
-            ["Real Quick Funds", fmt(c.dcFee), `DC fee (${(c.dcFeeRate * 100).toFixed(0)}% of ${fmt(c.abPurchase)} purchase price)`],
+            ["Real Quick Funds", fmt(c.dcFee), `DC fee (${(c.dcFeeRate * 100).toFixed(2)}% of ${fmt(c.abPurchase)} purchase price)`],
             ["Brown Palakka & Associates", fmt(c.bpaCapFromC3), "Echo capital return"],
             ["Brown Palakka & Associates", fmt(c.bpaFeeFromC3), `Echo fee (2.5% of ${fmt(c.echo)})`],
             ["Hilame Kinikini", fmt(c.hilameFromC3), c.hilameFromC3 > 0 ? "Seller carry benefit (remainder after exits)" : "Seller carry benefit (fully consumed by exits)"],
