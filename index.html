@@ -84,7 +84,7 @@ const Card = ({ children }) => (
 const StatBox = ({ label, value, sub, color = "#1e293b" }) => (
   <div style={{
     background: "white", borderRadius: "8px", padding: "16px 20px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.1)", flex: "1 1 200px", minWidth: "180px"
+    boxShadow: "0 1px 3px rgba(0,0,0,0.1)", flex: "1 0 200px", minWidth: "180px"
   }}>
     <div style={{ fontSize: "12px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "4px" }}>{label}</div>
     <div style={{ fontSize: "24px", fontWeight: 700, color }}>{value}</div>
@@ -101,8 +101,8 @@ const InfoBox = ({ color, borderColor, children }) => (
 
 function App() {
   const [bcPrice, setBcPrice] = useState(3600000);
-  const [abCC, setAbCC] = useState(150000);
-  const [bcCC, setBcCC] = useState(100000);
+  const [abCC, setAbCC] = useState(120000);
+  const [bcCC, setBcCC] = useState(10000);
   const [dcFeeRate, setDcFeeRate] = useState(0.02);
 
   const c = useMemo(() => {
@@ -223,10 +223,10 @@ function App() {
               <label style={{ fontWeight: 700, color: "#1e293b", fontSize: "13px" }}>A->B Closing Costs</label>
               <span style={{ fontSize: "20px", fontWeight: 800, color: "#1e40af" }}>{fmt(abCC)}</span>
             </div>
-            <input type="range" min={5000} max={250000} step={1000} value={abCC}
+            <input type="range" min={5000} max={200000} step={1000} value={abCC}
               onChange={(e) => setAbCC(Number(e.target.value))} />
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#94a3b8", marginTop: "4px" }}>
-              <span>$5,000</span><span>$250,000</span>
+              <span>$5,000</span><span>$200,000</span>
             </div>
           </div>
         </Card>
@@ -236,10 +236,10 @@ function App() {
               <label style={{ fontWeight: 700, color: "#1e293b", fontSize: "13px" }}>B->C Closing Costs</label>
               <span style={{ fontSize: "20px", fontWeight: 800, color: "#7c3aed" }}>{fmt(bcCC)}</span>
             </div>
-            <input type="range" min={5000} max={250000} step={1000} value={bcCC}
+            <input type="range" min={5000} max={150000} step={1000} value={bcCC}
               onChange={(e) => setBcCC(Number(e.target.value))} />
             <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#94a3b8", marginTop: "4px" }}>
-              <span>$5,000</span><span>$250,000</span>
+              <span>$5,000</span><span>$150,000</span>
             </div>
           </div>
         </Card>
