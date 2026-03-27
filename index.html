@@ -104,12 +104,12 @@ function App() {
   const [abCC, setAbCC] = useState(10000);
   const [bcCC, setBcCC] = useState(10000);
   const [dcFeeRate, setDcFeeRate] = useState(0.02);
+  const [dscrRate, setDscrRate] = useState(0.78);
 
   const c = useMemo(() => {
     const abPurchase = 3500000;
     const echoFeeRate = 0.025;
-    const dscrRate = 0.80;
-    const sellerCarry = 700000;
+        const sellerCarry = 700000;
 
     const rqfDcFunding = abPurchase + abCC;
     const enviiCash = abPurchase - sellerCarry;
@@ -184,7 +184,7 @@ function App() {
       hilameNetOOP,
       totalC2In: dscrLoan + echo + hilameOOP,
     };
-  }, [bcPrice, abCC, bcCC, dcFeeRate]);
+  }, [bcPrice, abCC, bcCC, dcFeeRate, dscrRate]);
 
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", padding: "32px 20px" }}>
@@ -261,6 +261,19 @@ function App() {
             </div>
           </div>
         </Card>
+        <Card>
+            <div style={{ padding: "16px 20px", minWidth: "280px", flex: "1 1 280px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                <label style={{ fontWeight: 700, color: "#1e293b", fontSize: "13px" }}>BC Primary Lender %</label>
+                <span style={{ fontSize: "20px", fontWeight: 800, color: "#059669" }}>{(dscrRate * 100).toFixed(0)}% = {fmt(Math.round(bcPrice * dscrRate))}</span>
+              </div>
+              <input type="range" min={0.50} max={0.85} step={0.01} value={dscrRate}
+                onChange={(e) => setDscrRate(Number(e.target.value))} />
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", color: "#94a3b8", marginTop: "4px" }}>
+                <span>50%</span><span>85%</span>
+              </div>
+            </div>
+          </Card>
       </div>
 
       {/* Key Stats */}
@@ -305,7 +318,7 @@ function App() {
         <div style={{ padding: "4px 16px 16px" }}>
           <h4 style={{ color: "#16a34a", fontSize: "13px", margin: "12px 0 4px", textTransform: "uppercase" }}>Cash In</h4>
           <Table headers={["From", "Amount", "Purpose"]} rows={[
-            ["Primary DSCR Lender (80%)", fmt(c.dscrLoan), "1st position mortgage"],
+            [`Primary DSCR Lender (${(dscrRate * 100).toFixed(0)}%)`, fmt(c.dscrLoan), "1st position mortgage"],
             ["Brown Palakka & Associates", fmt(c.echo), "Echo funding (down payment assist)"],
             ["Hilame Kinikini", fmt(c.hilameOOP), "Cash to close (out of pocket)"],
             ["Total In", fmt(c.totalC2In), ""],
