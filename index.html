@@ -118,16 +118,20 @@ function App() {
     const wholesaleSpread = bcPrice - abPurchase;
 
     // Hilame total cash to close at B->C (purchase + CC - DSCR loan)
-    const hilameTotalNeed = bcPrice + bcCC - dscrLoan;
+    // Hilame total cash to close at B->C (purchase + CC + dcFee - DSCR loan)
+    // DC fee now paid at Closing 2 from wholesaler spread
+    const hilameTotalNeed = bcPrice + bcCC + dcFee - dscrLoan;
 
     // At Closing 2: RQF gets abPurchase, then from wholesaler spread: abCC to RQF, rest held
     const wsToRqfAtC2 = Math.min(abCC, wholesaleSpread);
-    const wsHeldForC3 = Math.max(0, wholesaleSpread - wsToRqfAtC2);
+    const wsToDcFeeAtC2 = Math.min(dcFee, Math.max(0, wholesaleSpread - wsToRqfAtC2));
+    const wsHeldForC3 = Math.max(0, wholesaleSpread - wsToRqfAtC2 - wsToDcFeeAtC2);
 
     // At Closing 3: pool = sellerCarry + wsHeldForC3
     const c3Pool = sellerCarry + wsHeldForC3;
     // Must pay: dcFee + echo capital + echo fee
-    const availForEcho = c3Pool - dcFee;
+    // DC fee already paid at C2, so full pool available for echo
+    const availForEcho = c3Pool;
     const maxEchoFromPool = availForEcho > 0 ? Math.floor(availForEcho / (1 + echoFeeRate)) : 0;
 
     // Echo can't exceed what Hilame needs
@@ -140,7 +144,8 @@ function App() {
     const hilameToPurchase = Math.max(0, hilameOOP - hilameToCC);
 
     // Closing 3 disbursements
-    const rqfFromC3 = dcFee;
+    // Closing 3 disbursements (no DC fee -- paid at C2)
+    const rqfFromC3 = 0;
     const bpaCapFromC3 = echo;
     const bpaFeeFromC3 = echoFee;
     const hilameFromC3 = Math.max(0, c3Pool - dcFee - echo - echoFee);
@@ -171,7 +176,7 @@ function App() {
       wholesaleSpread, hilameTotalNeed,
       echo, echoFee, hilameOOP,
       hilameToCC, hilameToPurchase,
-      wsToRqfAtC2: wsToRqfCC, wsHeldForC3: wsHeld,
+      wsToRqfAtC2: wsToRqfCC, wsToDcFeeAtC2, wsHeldForC3: wsHeld,
       c3Pool,
       rqfFromC3, bpaCapFromC3, bpaFeeFromC3, hilameFromC3,
       bpaToRqfReturn, bpaToWsSpread,
@@ -311,8 +316,9 @@ function App() {
             ["Title / Recording / Escrow", fmt(c.bcCC), "Hilame's funds", "B->C closing costs"],
             ["Real Quick Funds", fmt(c.abPurchase), `${fmt(c.dscrLoan)} DSCR + ${fmt(Math.max(0, c.bpaToRqfReturn))} Brown Palakka + ${fmt(c.hilameToPurchase)} Hilame`, "DC capital return (A->B purchase price)"],
             ["Real Quick Funds", fmt(c.wsToRqfAtC2), "Wholesaler spread", "A->B closing costs reimbursement"],
+            ["Real Quick Funds", fmt(c.dcFee), "Wholesaler spread", `DC fee (${(c.dcFeeRate * 100).toFixed(2)}% of ${fmt(c.abPurchase)})`],
             ["HOLD -- Red Stone Homes LLC", fmt(c.wsHeldForC3), "Wholesaler spread", "Remaining wholesaler proceeds, held for Closing 3"],
-            ["Total Out", fmt(c.bcCC + c.abPurchase + c.wsToRqfAtC2 + c.wsHeldForC3), "", ""],
+            ["Total Out", fmt(c.bcCC + c.abPurchase + c.wsToRqfAtC2 + c.dcFee + c.wsHeldForC3), "", ""],
           ]} highlight={(i) => i === 4} />
 
           <InfoBox color="#eff6ff" borderColor="#bfdbfe">
@@ -377,7 +383,7 @@ function App() {
             ["Closing 1: DC funding", fmt(-c.rqfDcFunding), "--"],
             ["Closing 2: DC capital return (purchase price)", "--", fmt(c.abPurchase)],
             ["Closing 2: A->B CC reimbursement (from wholesaler)", "--", fmt(c.wsToRqfAtC2)],
-            ["Closing 3: DC fee", "--", fmt(c.dcFee)],
+            ["Closing 2: DC fee (from wholesaler spread)", "--", fmt(c.dcFee)],
             ["Totals", fmt(-c.rqfDcFunding), fmt(c.abPurchase + c.wsToRqfAtC2 + c.dcFee)],
             ["Net Profit", "", fmt(c.dcFee)],
           ]} highlight={(i) => i === 5} />
